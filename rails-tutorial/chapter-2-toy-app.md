@@ -1,3 +1,4 @@
+
 # We're making a toy app!
 
 This is going to be a scaffold driven app to get you in the Rails waters, and then we'll dive into the magic.
@@ -72,6 +73,18 @@ Remember that each url corresponds to an action, and parameters in the url give 
 
 `root 'users#index'`
 
+A <i>controller</i> contains a collection of related <i>actions</i> for a certain resource. You may or may not have a model, a model is only needed when you need information that persists.
+
+All of the url actions that we have, the controller actions that is, represents the implementation of the REST architecture, which is a way of sending messages to a server with your url.  Representational state transfer.  
+
+## REST
+
+It's an architectural style for developing distrubted, networked systems and software applications such as the WWW and web applications.
+
+It means that application components are modeled after resources that can be created, read, updated, and destroyed.  These operations correspond to the CRUD operations on relational databases, as well as to the four fundamental HTTP request methods, post, get , patch, delete.
+
+This means, that you must simply structure your applications using resources or application components that get created,read, updated, and deleted.  
+
 ### Exercises
 
 Write out steps for visiting the url "/users/1/edit"
@@ -87,3 +100,71 @@ So the guest enters in this url, this url is passed to the router who understand
 3. NO tests that test for data validation, authentication, or any other custom requirements.
 
 4. Terrible styling
+
+# THe Microposts Resource
+
+First we need to scaffold.
+
+1. `rails g scaffold Micropost content:text user_id:integer`
+
+Interesting, you'd think a  micropost would just be a string due to the character limit, but this works, I'm sure you can always put a cap on the character limit after the fact, and this way, you can choose your own character limit.
+
+2. Migrate
+
+get patch and delete are same url, `/microposts/1` just with different methods attached to them.
+
+So, the interesting thing here, and this confirmed what I thought earlier, that even though we have a column in our micropost table for  `user_id` we still don't have any connection to a user at the moment, it's not a foreign key.
+
+Also, there is no character limit as well as no validations.
+
+To do this, we need to go into the microposts model.
+
+This is what the model should look like now.
+
+3.  
+
+```ruby
+class Micropost < ApplicationRecord
+  validates :content, length: { maximum: 140 }
+end
+```
+
+And that works!
+
+```ruby
+class Micropost < ApplicationRecord
+  validates :content, length: { maximum: 140 }
+  belongs_to :user
+end
+```
+
+```ruby
+class User < ApplicationRecord
+  has_many :microposts
+end
+```
+
+And here we create the associations, I did that from memory baby. lets get it.
+
+And remember, in the rails console, when you hit `User.last.microposts` even if its only one micropost, you will still have an array. so you can't do,  `User.last.microposts.user`, it would have to be, `User.last.microposts.first.user`
+
+Now we update for validations...
+
+```ruby
+class Micropost < ApplicationRecord
+  belongs_to :user
+  validates :content, length: { maximum: 140 }, presence: true
+end
+```
+
+```ruby
+class User < ApplicationRecord
+  has_many :microposts
+  validates :name, presence: true
+  validates :email, presence: true
+end
+```
+
+So now we can just push it up to github and heroku, and then make sure to migrate the database.
+
+And everything works! Beautiful! 

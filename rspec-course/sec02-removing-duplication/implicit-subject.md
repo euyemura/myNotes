@@ -26,3 +26,5 @@ RSpec.describe Hash do
 end
 
 ```
+
+But subject is only implicity ok when it doesn't need any initialization arguments. 
