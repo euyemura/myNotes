@@ -54,3 +54,7 @@ And here is how we call it in the application layout file.
 So, you know how for special characters you sometimes have to escape them in order to get them to print correctly, with single quotes, you don't need to do that, it prints everything literally.  YOu will have to escape characters in the double quotes though, since they give you extra functionality.
 
 ## Back to the helper
+
+Remember that we are working with a module here.  Modules need to be mixed in, you do this by explicitly `include Module` inside your class or whatever, this gives the object access to all the methods of the module.
+
+The beautiful thing about this is that rails does this for you, thus the module is available in all of our views, as it is in the application helper. 
