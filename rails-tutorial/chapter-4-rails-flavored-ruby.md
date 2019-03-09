@@ -57,4 +57,122 @@ So, you know how for special characters you sometimes have to escape them in ord
 
 Remember that we are working with a module here.  Modules need to be mixed in, you do this by explicitly `include Module` inside your class or whatever, this gives the object access to all the methods of the module.
 
-The beautiful thing about this is that rails does this for you, thus the module is available in all of our views, as it is in the application helper. 
+The beautiful thing about this is that rails does this for you, thus the module is available in all of our views, as it is in the application helper.
+
+## Arrays
+
+So we have lots of array methods, like `arr.sort` but these won't mutate the actual array, in order to do that, you can simply add a bang.
+
+`arr.sort!` now arr will be permanently changed.
+
+## Range
+
+`0..9`
+`(0..9).to_a`
+
+```ruby
+a = %w[foo bar baz quuz]
+a[0..2]
+# ["foo", "bar", "baz"]
+# a trick to return every element
+a[0..-1]
+```
+
+Awesome
+
+Check out this shorthand for an array method map.
+
+```ruby
+%w[A B C].map(&:downcase)
+# => ['a', 'b, 'c]
+```
+
+## Hashes
+
+```ruby
+user = {} #i've just instantiated a fresh new Hash
+user["first_name"] = "Eric"
+user["last_name"] = "Uyemura"
+user
+
+# or you can write it this way.
+
+user = { "first_name" => "Eric", "last_name" => "Uyemura" }
+```
+
+A  lot of times however, the key for a hash will be a symbol.
+
+```ruby
+user1 = { :name => "Eric Uyemura", :email => "test@example.com" }
+
+user2 = { name: "Eric Uyemura", email: "test@example.com" }
+
+user1 == user2
+# true
+```
+
+When you perform `each` on a hash, it expects two block variables.
+
+```ruby
+flash.each do |key, value|
+  puts "Key #{key.inspect} has value #{value.inspect}"
+end
+```
+
+Curious though why they have to do inspect.
+
+## With our new knowledge of hashes and symbols!
+
+`<%= stylesheet_link_tag 'application', media: 'all',
+                                       'data-turbolinks-track': 'reload' %>`
+
+That is equal to this...
+
+`stylesheet_link_tag('application', { media: 'all',
+                                   'data-turbolinks-track': 'reload' })`
+
+As we can see here, we're calling a function and giving it arguments, a few of which are key value paris.
+
+So, a hash is the last value of the argument, because of this we do not need to put in the curly braces.
+
+## Class inheritance
+
+Check out this pretty awesome example of class inheritance.
+
+```ruby
+class Word
+  def palindrome?(string)
+    string == string.reverse
+  end
+end
+```
+
+This makes way more sense though.
+
+```ruby
+class Word < String
+  def palindrome?
+    self == self.reverse
+    # same as self == reverse , because if no object is specified it automatically defaults to self
+  end
+end
+# now you can do a bunch of other methods .
+
+s = Word.new("level")
+# you can instantiate it like a string, there is no muddling of methods since Word just has one instance method that doesn't really interact with any other String method.
+s.palindrome?
+s.length
+
+```
+
+So this is good, but we can do better by adding the method to the String class itself, remember that we can always reopen a class.
+
+```ruby
+class String
+  def palindrome?
+    self == reverse
+  end
+end
+```
+
+The crazy thing is, if you go to the
