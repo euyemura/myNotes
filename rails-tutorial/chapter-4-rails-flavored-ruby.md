@@ -45,11 +45,21 @@ def full_title(page_title = '')
 end
 ```
 
+```ruby
+def full_title(page_title = '')
+  base_title = 'Ruby on Rails Tutorial Sample App'
+
+  page_title.empty? ? base_title : "#{page_title} | #{base_title}"
+end
+```
+
 And here is how we call it in the application layout file.
 
 `<title><%= full_title(yield(:title)) %></title>`
 
 ## Strings and methods
+
+All of these tests will be done in the rails console,  which the console starts in the development environment, as oppposed to the test and production environments.
 
 So, you know how for special characters you sometimes have to escape them in order to get them to print correctly, with single quotes, you don't need to do that, it prints everything literally.  YOu will have to escape characters in the double quotes though, since they give you extra functionality.
 
@@ -85,6 +95,16 @@ Check out this shorthand for an array method map.
 ```ruby
 %w[A B C].map(&:downcase)
 # => ['a', 'b, 'c]
+
+def random_subdomain
+  random_array = []
+  8.times do
+    random_array << ('a'..'z').to_a.sample
+  end
+  random_array.join
+end
+
+random_subdomain
 ```
 
 ## Hashes
@@ -118,7 +138,9 @@ flash.each do |key, value|
   puts "Key #{key.inspect} has value #{value.inspect}"
 end
 ```
+Inspect represents a literal string representation of whatever it is called on.
 
+Remember, `p whatever` is a short form of doing `whatever.inspect`
 Curious though why they have to do inspect.
 
 ## With our new knowledge of hashes and symbols!
@@ -131,7 +153,7 @@ That is equal to this...
 `stylesheet_link_tag('application', { media: 'all',
                                    'data-turbolinks-track': 'reload' })`
 
-As we can see here, we're calling a function and giving it arguments, a few of which are key value paris.
+As we can see here, we're calling a function and giving it arguments, a few of which are key value pairs.
 
 So, a hash is the last value of the argument, because of this we do not need to put in the curly braces.
 
@@ -174,5 +196,56 @@ class String
   end
 end
 ```
+Rails does this a bit, modifying built in classes, which isn't something you should usually do unless you have a very good reason to do so.
 
-The crazy thing is, if you go to the
+The  `.blank?` method is a good example.  As a bunch of white space is not considered  `.empty?`, they needed something to verify actual letters being there.
+
+We can go into the rails console and instantiate our static_pages_controller. then look at its methods.  But, our `home` `about` `contact` methods don't hvae a return value, and shouldn't because actions are supposed to render a  web page, not return a value.  This is because Rails isn't Ruby, it uses it's structure to do it's own magic.
+
+### Creating an example user model
+
+in application root, touch `example_user.rb`
+```ruby
+class User
+  attr_accessor :name, :email
+  def initialize(attributes = {})
+    # so if no attributes is defined, the @name and @email will be nil, because a default value for a nonexistent value is nil in a hash.
+    @name = attributes[:name]
+    @email = attributes[:email]
+  end
+
+  def formatted_email
+    "#{@name} <#{@email}>"
+  end
+end
+
+user = User.new(name: "hello", email: "world")
+# remember, no curly braces necessary when you are
+```
+
+```ruby
+class User
+  attr_accessor :first_name, :last_name, :email
+  def initialize(attributes = {})
+    @first_name = attributes[:first_name]
+    @last_name = attributes[:last_name]
+    @email = attributes[:email]
+  end
+
+  def full_name
+    "#{@first_name} #{@last_name}"
+  end
+
+  def alphabetical_name
+    "#{@last_name}, #{@first_name}"
+  end
+
+  def formatted_email
+    "#{full_name} <#{@email}>"
+  end
+end
+```
+
+Now we don't need this example_user file so lets delete it.
+
+`rm example_user.rb`

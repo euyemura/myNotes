@@ -19,6 +19,8 @@ This will also begin the introduction to testing.
 
 See here, the 'arguments' in this command will be the methods that are created in this controller, or we can call them the actions.
 
+We have a controller, which is a class, and that controller of course has many methods, those methods correspond to what the router directs you to.
+
 Then we push this, and remember, when we are pushing a branch.
 
 `git push origin static-pages`
@@ -35,6 +37,7 @@ What happens if you mess up when you are generating something?
 
 `rails generate model User name:string email:string`
 `rails destroy model User`
+We haven't gone over this yet but notice how for this destroy action we dont actually need to provide the other ancillary arguments.
 
 There you go.
 
@@ -42,13 +45,19 @@ To go back one migration , `rails db:rollback`
 
 To go back to the very beginning, `rails db:migrate VERSION=0`
 
+I'm not sure how to list all the version numbers of all the migrations in order to target the exact one you want but I think we will go over this.
+
+The routes file is reponsible for implementing the router, which is the correspondence between urls and webpages, and more specifically, urls and controller methods or actions.  
+
 ### HTTP Protocol
 
-HTTP defines basic operations get, post, patch, delete. These operations refer to the interactions between a client and a server.  An emphasis on HTTP verbs is typical of web frameworks influenced by REST architecture.
+HTTP defines basic operations get, post, patch, delete. These operations refer to the interactions between a client (browser like chrome or firefox) and a server (typically running a webserver like Apache or Nginx).  An emphasis on HTTP verbs is typical of web frameworks influenced by REST architecture.
 
-Get is for reading data.  post is for submitting a form, and for rails it can be used to update things.  Patch and delete are for updating and destroying things on the remote server. These are less common because browsers can't send them natively, but Rails has ways around that.
+Get is for reading data.  post is for submitting a form, and for rails it can be used to update things (so like searching something on google isn't a post, even though you are filling out a form in the search box, you're just defining what you're getting).  Patch and delete are for updating and destroying things on the remote server. These are less common because browsers can't send them natively, but Rails has ways around that.
 
 As you may have noticed, which I didn't notice, the static pages controller does not use standard rest actions,  we're not doing a new resource, or a show resource, or deleting or updating a resource, instead we just need to get a static page.
+
+So, basically, a url is visited, rails finds the correct controller based on the router, and then executes the code in the action, which could be a database query, from that point, the corresponding view to the action is rendered as html.
 
 ## Getting started on testing
 
@@ -60,9 +69,19 @@ Three benefits of automated tests!
 
 Write controller and model tests first usually, and maybe write integration tests second.  
 
+Write tests for the security model first, because security like safety is the basis for maslows hiearchy of needs.
+
+Dont necessarily write tests for extensive HTML which is ilkely to change.  
+
+Remember to write tests for error prone code, especially before a refactor.  
+
 ## Our First Test
 
 We already have a directory called test.
+
+Rails made this, and just to be clear, even though it kinda seems like we're testing html which would seem like a view, this is really a controller test.
+
+`ls test/controllers/` controllers being the keyword
 
 RED > GREEN > REFACTOR
 
@@ -85,6 +104,10 @@ class StaticPagesControllerTest < ActionDispatch::IntegrationTest
 end
 ```
 
+First we test whether the pages can be reached correctly based on the helper methods.
+
+The `assert_response :success` is saying that we expect to get a :success, which is a representation of an HTTP  status code 200.
+
 This will fail.
 
 But now we can add a get request to our routes page, which will create the helper that is `static_pages_about_url`, this prefix is actually a helper I had no idea.
@@ -104,11 +127,13 @@ And here's the test for the titles.
 
 `assert_select "title", "Home | Ruby on Rails Tutorial Sample App"`
 
+^ the above takes an html tag or selector and tests the content of it. so i wonder what an img would be.
 ```ruby
 test "should get about" do
   get static_pages_about_url
   assert_response :success
   assert_select "title", "About | Ruby on Rails Tutorial Sample App"
+  # i wonder if this can take a symbol instead of a string as the name of the selector. it doesnt
 end
 ```
 
