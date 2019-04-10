@@ -104,7 +104,7 @@ Big o notation is the language we use to run to see how long a language takes to
 
 When we talk about scalability, it means when we grow bigger and bigger with our input, how many more operations will we have to do??  Big o allows us to explain this concept.  
 
-Elements or input is on x axis, and operations is on y axis, and different functions have different growth charts, does it rise exponentially, or does it look almost like a sraight line?
+Elements or input is on x axis, and operations is on y axis, and different functions have different growth charts, does it rise exponentially, or does it look almost like a straight line?
 
 We can represent this in how long it takes to run, and then how many operations it takes to run.
 
@@ -114,7 +114,9 @@ This means that the notation for this is O(n) --> linear time. n is the number o
 
 for `everyone`, it would be O(10)
 
-O(n) is one of the more common big O notations, and it's performance is fair.  It doesn't run it in seconds, it measures it by how many operations compared to how many elements you entered in. 
+O(n) is one of the more common big O notations, and it's performance is fair.  It doesn't run it in seconds, it measures it by how many operations compared to how many elements you entered in.
+
+The big O depends on the number of inputs, n.  The elements in the array for nemo in this example. 
 
 ```javascript
 
