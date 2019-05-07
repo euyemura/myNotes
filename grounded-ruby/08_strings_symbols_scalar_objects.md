@@ -38,13 +38,13 @@ EOM
 
 This is pretty cool,
 
-```
+```ruby
 text = <<-'EOM'
 single-quoted!
 Note the literal \n
 and the literal #{2+2}
 EOM
-
+# "single-quoted!\nNote the literal \\n\nand the literal \#{2+2}\n"
 a = <<EOM.to_i * 10
 55
 EOM
@@ -59,7 +59,8 @@ So this is part of the heredoc which is definitely odd
 umm
 yeah
 EOM
-puts array
+p array
+#[1, 2, 3, "So this is part of the heredoc which is definitely odd\numm\nyeah\n", 4]
 
 do_something_with_args(a, b, <<EOM)
 SO this is part of the heredoc interesting
@@ -154,6 +155,37 @@ eric = Person.new
 eric.name = "Eric"
 "Hello, #{eric}"
 ```
+```ruby
+# class practice
+class Person
+  attr_accessor :name
+  def say_it
+    @name
+  end
+end
+# from what i can tell these are literally exactly the same.
+
+class Person
+  attr_accessor :name
+  def say_it
+    name
+  end
+
+  def shout_it
+    @name
+  end
+end
+
+eric = Person.new
+ # => #<Person:0x00007fffbf798648>
+eric.name = "ERic"
+ # => "ERic"
+eric.say_it.object_id == eric.shout_it.object_id
+ # => true
+```
+
+
+
 ### Querying Strings
 
 ```ruby
@@ -238,7 +270,7 @@ string.center(21, "/")
 
 `chop` does not take any arguments, it'll always take off the last character of the string that you give it.
 
-`chomp` defaults to the newline character, and will only take action if it finds that target string, you can also give it a string of any length and it will chomp it off i f it appears at the end of the string.
+`chomp` defaults to the newline character, and will only take action if it finds that target string, you can also give it a string of any length and it will chomp it off if it appears at the end of the string.
 
 They both have bang equivalents.
 
@@ -421,7 +453,7 @@ puts d.prev_day(10)
 
 You can iterate over them too...
 
-```ruby 
+```ruby
 d = Date.today
 next_week = d + 7
 d.upto(next_week) {|date| puts "#{date} is a #{date.strftime("%A")}"}

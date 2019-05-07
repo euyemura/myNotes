@@ -42,7 +42,7 @@ Ok that's messed up, it's not testing whether x == 1, but it's assigning x to 1,
 if false
   x = 1
 end
-p x # nil, because even though it's not assigned, it is created.  
+p x # nil, because even though it's not assigned, it is created.  So even if the condition is never met, it's evaluated? like, if you created a method that only ran if you called it, and in that method you assigned something, but u never called it, would it still have a space created for it? Let's see.
 p y # raises an error, y is unknown, it's never created
 ```
 
@@ -79,7 +79,7 @@ if m
 
 ### Case Statements
 
-A case statement starts with an expression, usually a single object or variable, but any expression can e used, and walks it through a list of possible matches.
+A case statement starts with an expression, usually a single object or variable, but any expression can be used, and walks it through a list of possible matches.
 
 Here's an example.
 
@@ -124,6 +124,9 @@ Case/when logic really boils down to these `object === other_object` statements.
 
 Here's how to define your own case statement behavior.
 
+`a === b` == Does `b` belong in a box of `a`
+`String === 'hello world'` This would be true, as `'hello world'` does belong in the box of `String`, as it is an instance of string, but not the other way around.
+
 ```ruby
 class Ticket
   attr_accessor :venue, :date
@@ -155,11 +158,15 @@ else
 end
 ```
 
+When you're talking about `case` statements, you're really saying that the case is the instance, and whatever the when statement is, does the case (the instance) fit in the box of the when (the box)
+
 I wonder if you could put this in an each loop, go through all of the tickets.
 
 Lot's of syntactic sugar going on in the above example.
 
 You don't even necessarily need a test to case, it can just be testing various if statements.
+
+So, if given no `==` or whatever, the when will default to a `threequal` or `case equality matcher` otherwise, you can tell it what kind of behavior that you want.
 
 ```ruby
 case
@@ -182,7 +189,7 @@ end
   puts "looping forever"
  end`
 
- Same exact thing, so I suppose it's when there is a block of code that can be run multiple times, thats when you put `do`.
+Same exact thing, so I suppose it's when there is a block of code that can be run multiple times, thats when you put `do`.
 
 #### Breaking out of a loop!
 
@@ -197,6 +204,7 @@ end
 n = 1
 loop do
   n = n + 1
+  # when i put n + 2, it'll loop forever, since it never will equate to 10.
   puts n
   next unless n == 10
   break

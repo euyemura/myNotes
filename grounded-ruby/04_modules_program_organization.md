@@ -4,11 +4,11 @@
 - Handling method-lookup failure
 - Establishing namespaces with modules and nesting
 
-Modules are kind of like a way in order for you to organize your program.  Breaking big parts ino smaller components.
+Modules are kind of like a way in order for you to organize your program.  Breaking big parts into smaller components.
 
-Modules are a bit like Classes, they are bundles of methods and constants. But there are no instances to modules, you simply pecify that you want to ad the functionality of a module to a class or an object.
+Modules are a bit like Classes, they are bundles of methods and constants. But there are no instances to modules, you simply specify that you want to add the functionality of a module to a class or an object.
 
-Every Class is a direct descendant of a module.  Modules are even more basic than Classes, and classes are just a specialization of modules.   
+Every Class is a direct descendant of a module.  Modules are even more basic than Classes, and classes are just a specialization of modules (aren't these two statements mutually inclusive).   
 
 ### How to make a Module
 
@@ -41,7 +41,7 @@ We're going to make a module that acts like a stack.  A `stack` is a data struct
 
 Enter modules.
 
-WHen you're designing a program and you identify a behavior or set of behaviors that may be exhibited by more than one kind of entity or object, you've probably found a good candidate for a module.  
+When you're designing a program and you identify a behavior or set of behaviors that may be exhibited by more than one kind of entity or object, you've probably found a good candidate for a module.  
 
 you wrap it into a module, and then you can summon stacklikeness into any and all classes that need it.  
 
@@ -73,14 +73,14 @@ end
 
 So require and load are both for requiring files, and so they take a string that is the name of the file.
 
-Include and prepend however, generally take a constant as an argument, which is on a file somewhere, so it has nothing to do with files,so yeah.
+Include and prepend however, generally take a constant as an argument, which is on a file somewhere, so it has nothing to do with files, so yeah.
 
 Look at naming convention, 'Stack objects are stacklike'  The class is a noun, while the module is an adjective.
 
 But we could have just made this a Class in and of itself, however, that defeats the purpose of modeling a certain type of behavior seen in the real world and using it in a multitude of classes and objects.
 
 
-We can make a suitecase example as well, which we will indeed do.  
+We can make a suitcase example as well, which we will indeed do.  
 
 `touch cargohold.rb`
 
@@ -183,6 +183,7 @@ end
 
 class Tandem < Bicycle
   def initialize(gears)
+    # the fact that you have gears as an argument means that it's not going to have the default of 1 gear as in its parent class, if you were to delete gears as an argument, then due to super, the gears would have the exact same behavior as its parent and thus it would default to 1. 
     super
     @seats = 2
   end

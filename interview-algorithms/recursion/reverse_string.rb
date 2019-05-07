@@ -25,6 +25,4 @@ def reverse_string_recursively(str)
   end
 end
 
-
-
 reverse_string("Hello World!")

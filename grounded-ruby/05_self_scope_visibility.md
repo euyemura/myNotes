@@ -21,7 +21,8 @@ class D < C
 end
 
 D.x
-
+# Class method of class C
+# self: D
 # this will result in self being D, as D inherits the Class methods of C, but it is calling it from D.
 ```
 
@@ -35,6 +36,7 @@ class C
     puts "As long as self is C, you can call this method with no dot"
   end
   no_dot
+  puts "hello"
 end
 
 C.no_dot
@@ -55,12 +57,36 @@ end
 c = C.new
 c.y
 
-# => This is method 'y', about to call x wtihout a dot.
+# => This is method 'y', about to call x without a dot.
 # => This is method 'x'
 ```
 
 Remember, self is going to be the intantiated object, so, in y, it's calling self.x, which is c.x, which is indeed a thing.
 
+But here's an example that I do not believe would work.
+
+```ruby
+class B
+  def B.whisper
+    puts "I'm whispering from the class method. self is #{self}"
+    self.respond_to? :scream
+    # false
+  end
+
+  def scream
+    puts "I am screaming from the instantiated object probably, self is #{self}"
+  end
+
+  def test
+    scream
+  end
+
+  def test_class
+    whisper
+    # doesn't work
+  end
+end
+```
 So we're good!
 
 
@@ -72,6 +98,7 @@ Every instance variable you'll ever see in a Ruby program belongs to whatever ob
 class C
   def show_var
     @v = "I am an instance variable initialized to a string"
+    # if the above is there, it'll never use the other instance variable, lets try commenting it out. Doesn't make a difference
     puts @v
   end
   @v = "instance variables can appear anywhere..."
@@ -87,6 +114,9 @@ class C
   @v = "I am an instance variable at the top level of a class body."
   puts "And here's the instance variable @v, belonging to #{self}:"
   p @v
+  def create_v
+    @v = "i am an abomination"
+  end
   def show_var
     puts "Inside an instance method definition block.  Here's self:"
     p self
@@ -151,6 +181,8 @@ end
 
 So this is kind of like the relative path to the constant, however, sometimes you need to refer to things in absolute terms, this is because it may be ambiguous as to which constant you want to find if two have the same name.
 
+I GET IT NOW! The reason beforehand those instance variables weren't set is because a method has to be run in order for the variable to be actually initialized, because the declaration happens only when the method is run, thats why, def initialize is great, because it runs when the object is created, so all the instance variables are set.  However, if it's in a different method, you actually have to specifically run them, and then they will be set if other methods use them, which is pretty awesome.
+
 ```ruby
 class Violin
   class String
@@ -205,7 +237,7 @@ So right here, the answer is actually 200, since @@value is the exact same varia
 
 Also check out `new_car.rb`
 
- The biggest obstacle to understanding these examples is understanding the fact that classes are aobjects-and that every object, whether its a car, a person, or a class, gets to have its own stash of instance variables. Car and Hybrid can keep track of manufacturing numbers separately, thanks to the way instance variables are quarantined per objects
+ The biggest obstacle to understanding these examples is understanding the fact that classes are objects-and that every object, whether its a car, a person, or a class, gets to have its own stash of instance variables. Car and Hybrid can keep track of manufacturing numbers separately, thanks to the way instance variables are quarantined per objects
 
 
 Remember that instance variables always belong to the current self.  
@@ -256,6 +288,7 @@ class Dog
   def age= (years)
     @age = years
     self.dog_years = years * 7
+    # even though self is implied here, when you are using private setters I guess you must explicitly state self.
   end
 
   private :dog_years=
@@ -267,7 +300,7 @@ You can only call these when you are able to use the keyword `self` as the recei
 
 ### Protected Methods
 
-A protected method is available to the family of the whatever method it was defined in.
+A protected method is available to the family of whatever method it was defined in.
 
 ```ruby
 class C
@@ -353,7 +386,7 @@ class Object
 end
 ```
 
-You can call these methods anywhere, as long as there is no explicity receiver, which is pretty cool.
+You can call these methods anywhere, as long as there is no explicit receiver, which is pretty cool.
 
 From commmand line to look at built in top level method
 
