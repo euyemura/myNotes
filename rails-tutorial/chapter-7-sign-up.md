@@ -241,7 +241,7 @@ So we have a working show page, but now we need to do another REST action, that 
 
 ### Using `form_for`
 
-Basically, we need a way to allow a user to input the correct information, and send that to our database.  This where the `form_for` rails helper method comes into place, it takes an active record object and builds a form using the objects attributes!  And by an active record object, we're talking about an instance of a data table, or all the columns in the table rather.
+Basically, we need a way to allow a user to input the correct information, and send that to our database.  This is where the `form_for` rails helper method comes into place, it takes an active record object and builds a form using the objects attributes!  And by an active record object, we're talking about an instance of a data table, or all the columns in the table rather.
 
 So, we need to send this object to the view, and where do we do that?? The controller.
 
@@ -285,3 +285,266 @@ app/views/users/new.html.erb
  </div>
 </div>
 ```
+
+So, the `form_for` helper, you pass it an object, which is the new instance of whatever data model you are instantiating.  You then give it a block variable, which represents an object that has many other helper methods.  These helper methods expect an argument, that argument is a symbol, which represents a key in a hash that represents the different columns inside of whatever data model that you are instantiating, get it?
+
+### Signup form HTML
+
+When the block variable `f` comes along with an html element, a text field, or a radio button(which will set an attribute), or password field, `f` returns the code for that element which is then designed to set an attribute for the `@user` object
+
+```ruby
+<%= f.label :name %>
+<%= f.text_field :name %>
+```
+I think something to note here is that all of the inputs that are created from the `form_for` helper have different types, `text`, `email`, `password`, this does have some impact.  A type of `password` will obscure the characters that are typed in which is for security purposes, a type of `email` will bring up a keyboard on mobile devices that is optimized for entering in an email, you know what I'm talking about.
+
+Each input also has a `name` attribute that has a value of something like `name="user[name]"`, this allows rails to create an initialization hash in order to construct hte user object that is about to be created, it does this using the params variable
+
+The `form` element itself has an action of `"/users"` and a method of `post`, which means that it can send an HTTP `post` request to the `/users` URL
+
+```html
+<form action=" /users" class="new_user" id="new_user" method="post">
+```
+
+The action corresponds to the url the website is sending information to, and the post is the correct http verb for creating a new object, so the form creates an initialization hash, sends it to /users with a post method.
+
+## Unsuccessful Signups
+
+So, now we're going to look at the errors that we get when we try to submit an invalid user.  However, immediately when pressing submit on an empty user, we don't get our validation errors, instead, we get the Rails error that there is no create action.  This means that we have to create the `create` action and send it the information that we have gathered from the form.
+
+### A Working Form  
+
+We will be using the `render` method again, which we first saw in the context of partials.  
+
+You can also use render in controller actions.
+
+The next strategy we are using is a conditional structure inside of our controller, depending on the return of the `@user.save` method (which can be true or false) we are going to do something.
+
+Here's a portion of what it will look like.
+
+```ruby
+class UsersController < ApplicationController
+
+  def show
+    @user = User.find(params[:id])
+  end
+
+  def new
+    @user = User.new
+  end
+
+  def create
+    debugger
+    @user = User.new(params[:user])    # Not the final implementation!
+    if @user.save
+      # Handle a successful save.
+    else
+      render 'new'
+    end
+  end
+end
+```
+
+Alright so this is cool, I have a controller with a `create` action, all i put inside of it was a debugger, I then looked at what were in the params, under params[:user], i got the entire hash that was needed in order to make a new user, which is why the code above should work given valid information `User.new(params[:user])`
+
+Ok, but the above example wasn't working, apparently there was a forbiddenattributeserror, this is where those darn strong params come in, you have to let Rails know which values you want coming in, which attributes you are allowing to save to the database.
+
+This is dangerous, we don't want to allow a user to enter in whatever attributes that they please.  For example, when we are making someone an admin, they pass into the hash a `admin = '1'` value.  Of course, you may be wondering, well, in our example of the sign up page, there is only the inputs that we have created, so why would this be a problem?  That's true, according to the view we created, it would be safe, but, using a command-line http client like `curl` one could pass into the params hash whatever they wanted!
+
+Now, in Rails 4.0 and later, we have strong parameters, which specifiy which parameters are required and which are permitted.
+
+```ruby
+params.require(:user).permit(:name, :email, :password, :password_confirmation)
+```
+
+So this is what we need.
+
+It's also conventional to introduce an auxiliary method called `user_params`, this method returns an appropriate initialization hash, and uses it in place of `params[:user]`
+
+```ruby
+@user = User.new(user_params)
+```
+Since it's only being used in the Users controller, we can make it a private method.  
+
+```ruby
+class UsersController < ApplicationController
+  def new
+    @user = User.new
+  end
+
+  def show
+    @user = User.find(params[:id])
+  end
+
+  def create
+    @user = User.new(user_params)    # Not the final implementation!
+    if @user.save
+      # Handle a successful save.
+    else
+      render 'new'
+    end
+  end
+
+  private
+
+    def user_params
+      params.require(:user).permit(:name, :email, :password, :password_confirmation)
+    end
+end
+```
+
+### Signup error messages
+
+I can't quite remember why in my portfolio it automatically provided error messages, however, we will be implementing a partial in order to display the `user.errors.full_messages`, and then we will be adding a class of `form-control` to it, this has special meaning to Bootstrap.
+
+```
+<% provide(:title, 'Sign up') %>
+<h1>Sign up</h1>
+
+<div class="row">
+  <div class="col-md-6 col-md-offset-3">
+    <%= form_for(@user) do |f| %>
+      <%= render 'shared/error_messages' %>
+
+      <%= f.label :name %>
+      <%= f.text_field :name, class: 'form-control' %>
+
+      <%= f.label :email %>
+      <%= f.email_field :email, class: 'form-control' %>
+
+      <%= f.label :password %>
+      <%= f.password_field :password, class: 'form-control' %>
+
+      <%= f.label :password_confirmation, "Confirmation" %>
+      <%= f.password_field :password_confirmation, class: 'form-control' %>
+
+      <%= f.submit "Create my account", class: "btn btn-primary" %>
+    <% end %>
+  </div>
+</div>
+```
+
+We have put this partial in a `shared` directory, which is normal when you are using a partial across views.
+
+`mkdir app/views/shared`
+
+Here's the code for the partial
+
+`app/views/shared/_error_messages.html.erb`
+
+```html
+<% if @user.errors.any? %>
+  <div id="error_explanation">
+    <div class="alert alert-danger">
+      The form contains <%= pluralize(@user.errors.count, "error") %>.
+    </div>
+    <ul>
+    <% @user.errors.full_messages.each do |msg| %>
+      <li><%= msg %></li>
+    <% end %>
+    </ul>
+  </div>
+<% end %>
+```
+
+There's some Rails things here, but mostly we see a lot of different Ruby methods, for example, we have `empty?` and `any?` which test if there is any content, although I always thought that any?
+
+There's also a really cool `pluralize` helper, this is available in the console but I don't believe that this is core ruby.
+
+```ruby
+# you access it with the helper object
+helper.pluralize(1, "error")
+helper.pluralize(4, "error")
+helper.pluralize(1, "goose")
+helper.pluralize(9, "goose")
+# so it doesn't know the plural of goose but it does know the plural of octopus which is a bit odd.
+```
+
+Because we have added id's and class names to these elements, we can style them in our custom.css file.
+
+
+```css
+
+/* forms */
+.
+.
+.
+#error_explanation {
+  color: red;
+  ul {
+    color: red;
+    margin: 0 0 30px 0;
+  }
+}
+
+.field_with_errors {
+  @extend .has-error;
+  .form-control {
+    color: $state-danger-text;
+  }
+}
+```
+
+I assume that the URL for the unsubmitted form `/signup` and the submitted sign up form `/users` is different because Rails expects to redirect you to the actual user, however, because it wasn't a valid user, it kind of stalled out on just `/users` instead of `/users/2` or whatever.
+
+### A test for invalid submission
+
+Instead of the old days when we had to test applications by hand by entering in every combination of invalid data and then valid data, and then repeating those changes whenever the site changed, we can now just create automated testing, we will do this now.
+
+`rails generate integration_test users_signup`
+
+This is dope, first we do a get request on the signup_path, because of course, we need to go to the signup page in order to test it.
+
+`get signup_path`
+
+```ruby
+assert_no_difference 'User.count' do
+  post users_path, params: { user: { name: "", email: "user@invalid", password: "foo", password_confirmation: "bar"
+    }}
+end
+# you may be wondering why we are adding a params hash, params[:user], well, it's because that's what the controller is expecting by the User.new part of the create action.
+```
+
+This is pretty much the same thing as writing something like this.
+
+Essentially what we are doing is giving User.count to the assert_no_difference method, which will check it before and after the code block has run, and from then on it will make sure that there is indeed no difference, the assertion that we made.
+
+```ruby
+before_count = User.count
+post user_path # and all the other shit, posting the params[:user] and whatnot.
+after_count = User.count
+assert_equal before_count, after_count
+```
+
+I think the thing that is interesting here, is that the get and post actions are not really related, it makes it clearer when reading it, first we are going to the signup path, and then we are hitting the post action, but really we could just hit the post action without going to get, because as far as rails is concerned, it doesn't matter where we are sending that post action from.
+
+```ruby
+test "invalid signup information" do
+  get signup_path
+  assert_no_difference 'User.count' do
+    post users_path, params: { user: { name: "", email: "user@invalid", password: "foo", password_confirmation: "bar"} }
+  end
+  assert_template 'users/new'
+      # so i guess the thing i'm confused about is how important the ordering here is, like, is it really posting somethiing, and then aftewards being like, i'm also asserting that now we are going back to the users/new page.  what if we changed it, would the test fail, lets see!
+  assert_select "div#error_explanation div.alert", "The form contains 4 errors."
+  assert_select 'div.field_with_errors'
+  # as you can see we have some assertions based on the html that Rails created with our error partial.  I kind of wanted to go more in depth on this side of things,
+end
+```
+
+
+## Successful Signups
+
+```ruby
+def create
+  @user = User.new(user_params)    # Not the final implementation!
+  if @user.save
+    # redirect_to user_path @user
+    redirect_to @user
+  else
+    render 'new'
+  end
+end
+```
+
+Thats the fully implemented create action

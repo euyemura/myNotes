@@ -403,6 +403,41 @@ end
 puts "100/#{n} is #{result}"
 ```
 
+
+Here's my cooler version of it.
+
+```ruby
+while true
+  print "Enter a number: "
+  n = gets.to_i
+  begin
+    result = 100/n
+  rescue
+    puts "This couldn't be calculated, did you enter zero?"
+    next
+  end
+  puts "100/#{n} is #{result}"
+  break
+end
+```
+
+HEre's a better version of that last one
+
+```ruby
+loop do
+  print "Enter a number: "
+  n = gets.to_i
+  begin
+    result = 100/n
+  rescue
+    puts "This couldn't be calculated, did you enter zero?"
+    next
+  end
+  puts "100/#{n} is #{result}"
+  break
+end
+```
+
 ### Using rescue inside methods and code blocks .
 
 If it is already within a method or code block, there is no need to say begin, assuming you want the entirety of the method or code block to be governed by rescue.
@@ -497,7 +532,7 @@ This is to intercept that exception, that error, and then to make a note of it, 
 
 ### The `ensure` clause
 
-Here's an example, you have a data file, and you want to read a line off of it.  if this data file does not contain a particular substring, you raise an exception, if it does, you return the line.  If it doesn't, the errror you will raise is an ArgumentError, but no matter what, we will close the fild handle no matter what.
+Here's an example, you have a data file, and you want to read a line off of it.  if this data file does not contain a particular substring, you raise an exception, if it does, you return the line.  If it doesn't, the error you will raise is an ArgumentError, but no matter what, we will close the file handle no matter what.
 
 ```ruby
 def line_from_file(filename, substring)

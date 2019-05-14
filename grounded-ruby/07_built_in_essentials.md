@@ -53,7 +53,7 @@ class Account
   end
 # this kind of gives you a shortcut to write the += method, as it condenses it into one step in this version.
   def -(x)
-    self-balance -= x
+    self.balance -= x
   end
 
   def to_s
@@ -83,7 +83,7 @@ class Banner
   end
 
   def !
-    @text.reverse
+    @text = @text.reverse
   end
 end
 
@@ -100,6 +100,8 @@ So check out the above example,, first of all, if you wanted to modify any of th
 
 I'm still not sure why the to_s thing is there, don't think it really changes anything, it's just a reader method in this case.
 
+Well actually, it gives you access to change the puts method, because puts basically is just saying whatever.to_s, so the p method won't change, it'll still just print out the entire object in string form, not the specific property of the object that we wanted.
+
 In the bang method, it also gives you access to the long form, `puts not banner`
 
 ### Bang(!) methods and "danger"
@@ -114,7 +116,7 @@ str.upcase! # "HELLO"
 str # "HELLO"
 ```
 
-If ou call the nonbang version of the method on the object, you are creating a new object.  If you call teh bang version, you operate in place and change that same object.
+If you call the nonbang version of the method on the object, you are creating a new object.  If you call the bang version, you operate in place and change that same object.
 
 Here is one consideration, when you don't use the bang version, you use more space in memory, as you are creating a new object.  If you use the bang, you are never creating more objects from that method.
 
